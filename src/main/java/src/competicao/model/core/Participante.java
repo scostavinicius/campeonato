@@ -1,18 +1,19 @@
 package src.competicao.model.core;
 
+import src.competicao.service.TimeService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// TODO: PARTICIPANTE COMO TABELA INTERMEDIARIA ENTRE TIME E CAMPEONATO
 public class Participante implements Comparable<Participante> {
     private Time time;
     private List<Partida> partidas;
-    private Integer vitorias;
-    private Integer empates;
-    private Integer derrotas;
-    private Integer golsMarcados;
-    private Integer golsSofridos;
+    private int vitorias;
+    private int empates;
+    private int derrotas;
+    private int golsMarcados;
+    private int golsSofridos;
 
     public Participante(Time time) {
         Objects.requireNonNull(time, "O Time participante não pode ser nulo.");
@@ -51,8 +52,8 @@ public class Participante implements Comparable<Participante> {
 
         this.partidas.add(partida);
 
-        Integer golsPro;
-        Integer golsContra;
+        int golsPro;
+        int golsContra;
 
         if (partida.getMandante().equals(this)) {
             golsPro = partida.getGolsMandante();
@@ -82,35 +83,35 @@ public class Participante implements Comparable<Participante> {
         return new ArrayList<>(partidas);
     }
 
-    public Integer getVitorias() {
+    public int getVitorias() {
         return vitorias;
     }
 
-    public Integer getEmpates() {
+    public int getEmpates() {
         return empates;
     }
 
-    public Integer getDerrotas() {
+    public int getDerrotas() {
         return derrotas;
     }
 
-    public Integer getGolsMarcados() {
+    public int getGolsMarcados() {
         return golsMarcados;
     }
 
-    public Integer getGolsSofridos() {
+    public int getGolsSofridos() {
         return golsSofridos;
     }
 
-    public Integer getQtdPartidasJogadas() {
+    public int getQtdPartidasJogadas() {
         return vitorias + empates + derrotas;
     }
 
-    public Integer getPontos() {
+    public int getPontos() {
         return 3 * vitorias + empates;
     }
 
-    public Integer getSaldoGols() {
+    public int getSaldoGols() {
         return golsMarcados - golsSofridos;
     }
 
@@ -125,6 +126,14 @@ public class Participante implements Comparable<Participante> {
                ", golsMarcados=" + golsMarcados +
                ", golsSofridos=" + golsSofridos +
                '}';
+    }
+
+    public String toStringL() {
+        return TimeService.getStringCorTime(this.getTime()) + " " + this.getTime().getNome();
+    }
+
+    public String toStringR() {
+        return this.getTime().getNome() + " " + TimeService.getStringCorTime(this.getTime());
     }
 
     @Override
@@ -143,21 +152,18 @@ public class Participante implements Comparable<Participante> {
     public int compareTo(Participante outro) {
         Objects.requireNonNull(outro, "O participante não pode ser nulo.");
 
-        int comparacaoPontos = outro.getPontos().compareTo(getPontos());
-        if (comparacaoPontos != 0) {
-            return comparacaoPontos;
+        if (this.getPontos() != outro.getPontos()) {
+            return outro.getPontos() - this.getPontos();
         }
 
-        int comparacaoVitorias = outro.getVitorias().compareTo(getVitorias());
-        if (comparacaoVitorias != 0) {
-            return comparacaoVitorias;
+        if (this.vitorias != outro.vitorias) {
+            return outro.vitorias - this.vitorias;
         }
 
-        int comparacaoSaldo = outro.getSaldoGols().compareTo(getSaldoGols());
-        if (comparacaoSaldo != 0) {
-            return comparacaoSaldo;
+        if (this.getSaldoGols() != outro.getSaldoGols()) {
+            return outro.getSaldoGols() - this.getSaldoGols();
         }
 
-        return outro.getGolsMarcados().compareTo(getGolsMarcados());
+        return outro.getGolsMarcados() - this.golsMarcados;
     }
 }

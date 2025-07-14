@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Testes da classe Participante")
 public class ParticipanteTest {
     private Time timeA;
     private Time timeB;
@@ -26,7 +27,7 @@ public class ParticipanteTest {
     }
 
     @Test
-    @DisplayName("Criar participante corretamente")
+    @DisplayName("Participante criado corretamente")
     void criarParticipante() {
         assertNotNull(participanteA);
         assertEquals(timeA, participanteA.getTime());

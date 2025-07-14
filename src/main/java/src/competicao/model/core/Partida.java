@@ -8,8 +8,8 @@ public class Partida {
 
     private Participante mandante;
     private Participante visitante;
-    private Integer golsMandante;
-    private Integer golsVisitante;
+    private int golsMandante;
+    private int golsVisitante;
     private Boolean jogada;
 
     public Partida(Participante mandante, Participante visitante) {
@@ -26,7 +26,7 @@ public class Partida {
         this.jogada = false;
     }
 
-    public void registrarResultado(Integer golsMandante, Integer golsVisitante) {
+    public void registrarResultado(int golsMandante, int golsVisitante) {
         if (jogada) {
             throw new IllegalArgumentException("O resultado dessa partida já foi registrado.");
         }
@@ -43,6 +43,10 @@ public class Partida {
         this.visitante.adicionarPartida(this);
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public Participante getMandante() {
         return mandante;
     }
@@ -51,16 +55,21 @@ public class Partida {
         return visitante;
     }
 
-    public Integer getGolsMandante() {
+    public int getGolsMandante() {
         return golsMandante;
     }
 
-    public Integer getGolsVisitante() {
+    public int getGolsVisitante() {
         return golsVisitante;
     }
 
     public Boolean isJogada() {
         return jogada;
+    }
+
+    @Override
+    public String toString() {
+        return mandante.toStringL() + " x " + visitante.toStringR();
     }
 
     @Override

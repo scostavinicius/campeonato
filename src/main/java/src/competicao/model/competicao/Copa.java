@@ -31,9 +31,7 @@ public class Copa implements Campeonato {
     }
 
     @Override
-    public void registrarResultadoPartida(Partida partida,
-                                          Integer golsMandante,
-                                          Integer golsVisitante) {
+    public void registrarResultadoPartida(Partida partida, int golsMandante, int golsVisitante) {
 
     }
 
@@ -45,6 +43,11 @@ public class Copa implements Campeonato {
     @Override
     public List<Partida> getPartidas() {
         return partidas;
+    }
+
+    @Override
+    public int getMaxParticipantes() {
+        return 0;
     }
 
     public List<Grupo> getGrupos() {

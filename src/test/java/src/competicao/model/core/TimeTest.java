@@ -6,7 +6,7 @@ import src.competicao.util.Cor;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Testes da Classe Time")
+@DisplayName("Testes da classe Time")
 public class TimeTest {
 
     @Test

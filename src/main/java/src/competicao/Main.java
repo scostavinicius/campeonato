@@ -1,139 +1,234 @@
 // src/competicao/main/Main.java
 package src.competicao;
 
-import src.competicao.model.core.Participante;
-import src.competicao.model.core.Tabela;
+import src.competicao.model.competicao.Liga;
+import src.competicao.model.core.Partida;
 import src.competicao.model.core.Time;
-import src.competicao.service.Display;
+import src.competicao.service.DisplayService;
+import src.competicao.util.CLIUtil;
 import src.competicao.util.Cor;
+import src.competicao.util.ScanTipo;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class Main {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final String barraTraco = "-".repeat(77);
+    private static final String barraIgual = "=".repeat(77);
+
+    private static void decTraco(String message) {
+        System.out.println(Cor.TEXT_VERDE_ESCURO_BOLD + barraTraco);
+        System.out.println(message);
+        System.out.println(barraTraco + Cor.RESET);
+    }
+
+    private static void decIgual(String message) {
+        System.out.println(Cor.TEXT_VERDE_ESCURO_BOLD + barraIgual);
+        System.out.println(message);
+        System.out.println(barraIgual + Cor.RESET);
+    }
+
     public static void main(String[] args) {
-        System.out.println("Iniciando o Teste de Tabela e Display!");
+        decIgual("INÍCIO DO PROGRAMA");
 
-        // --- 1. Criar Times (agora passando as constantes completas de Cor) ---
-        System.out.println("\n--- Criando Times ---");
-        // Passa as constantes ANSI completas (Cor.TEXT_VERMELHO, Cor.FUNDO_PRETO, etc.)
-        Time timeVasco = new Time("Vasco", Cor.FUNDO_BRANCO, Cor.FUNDO_PRETO);
-        Time timeCorinthians = new Time("Corinthians", Cor.FUNDO_PRETO, Cor.FUNDO_BRANCO);
-        Time timePalmeiras = new Time("Palmeiras", Cor.FUNDO_VERDE_VIRIDIAN, Cor.FUNDO_BRANCO);
-        // Time com 3 cores de fundo para teste
-        Time timeSaoPaulo =
-                new Time("São Paulo", Cor.FUNDO_VERMELHO_ESCURO, Cor.FUNDO_BRANCO, Cor.FUNDO_PRETO);
-        Time timeGremio =
-                new Time("Grêmio", Cor.FUNDO_PRETO, Cor.FUNDO_BRANCO, Cor.FUNDO_CIANO);
-        Time timeInternacional = new Time("Internacional", Cor.FUNDO_VERMELHO, Cor.FUNDO_BRANCO);
-        Time timeCruzeiro = new Time("Cruzeiro", Cor.FUNDO_AZUL_MARINHO, Cor.FUNDO_BRANCO);
+        System.out.println(barraIgual);
+        System.out.println("O que você deseja fazer?");
 
-        System.out.println("Exemplo de impressão de cores do Time:");
-        System.out.println(
-                Display.getStringCorTime(timeVasco) + " " + timeVasco.getNome());
-        System.out.println(
-                Display.getStringCorTime(timeSaoPaulo) + " " + timeSaoPaulo.getNome());
-        System.out.println(
-                Display.getStringCorTime(timeCruzeiro) + " " + timeCruzeiro.getNome());
+        while (true) {
+            try {
+                System.out.println("[1] Criar Copa");
+                System.out.println("[2] Criar Liga");
+                System.out.println("[3] SAIR");
+                System.out.println();
 
+                int opcao = ScanTipo.scanIntEmIntervalo("Digite sua opção: ", 1, 3);
 
-        // Restante do código do Main permanece o mesmo...
-        // --- 2. Criar Participantes para a Tabela ---
-        System.out.println("\n--- Criando Participantes ---");
-        Participante pFlamengo = new Participante(timeVasco);
-        Participante pCorinthians = new Participante(timeCorinthians);
-        Participante pPalmeiras = new Participante(timePalmeiras);
-        Participante pSaoPaulo = new Participante(timeSaoPaulo);
-        Participante pGremio = new Participante(timeGremio);
-        Participante pInternacional = new Participante(timeInternacional);
-        Participante pCruzeiro = new Participante(timeCruzeiro);
+                switch (opcao) {
+                    case 1 -> fluxoCopa();
+                    case 2 -> fluxoLiga();
+                    default -> {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Erro durante o programa: " + e.getMessage());
+            }
+        }
+    }
 
+    private static void fluxoCopa() {
+    }
 
-        // --- 3. Criar uma Tabela ---
-        System.out.println("\n--- Criando Tabela e Adicionando Participantes ---");
-        Tabela minhaTabela = new Tabela();
-        minhaTabela.setQtdClassificados(2, "Libertadores");
-        minhaTabela.setQtdRebaixados(2);
+    private static void fluxoLiga() {
+        Optional<Liga> novaLiga = criarLiga();
 
-        minhaTabela.adicionarParticipante(pFlamengo);
-        minhaTabela.adicionarParticipante(pCorinthians);
-        minhaTabela.adicionarParticipante(pPalmeiras);
-        minhaTabela.adicionarParticipante(pSaoPaulo);
-        minhaTabela.adicionarParticipante(pGremio);
-        minhaTabela.adicionarParticipante(pInternacional);
-        minhaTabela.adicionarParticipante(pCruzeiro);
-
-        try {
-            minhaTabela.adicionarParticipante(pFlamengo);
-        } catch (IllegalArgumentException e) {
-            System.out.println(
-                    "DEBUG: Erro esperado ao adicionar participante duplicado: " + e.getMessage());
+        if (novaLiga.isEmpty()) {
+            System.out.println("A Liga não foi criada.");
+            return;
         }
 
-        System.out.println(
-                "Classificados configurados: " + minhaTabela.getQtdClassificados() + " (" +
-                minhaTabela.getNomeClassificacao() + ")");
-        System.out.println("Rebaixados configurados: " + minhaTabela.getQtdRebaixados());
+        Liga liga = novaLiga.get();
 
-        // --- 4. Simular Partidas e Atualizar Participantes (diretamente) ---
-        System.out.println("\n--- Simulando Partidas e Atualizando Participantes ---");
+        decTraco("Liga criada com sucesso!");
 
-//        Partida p1 = new Partida(UUID.randomUUID(), timeFlamengo, timeCorinthians);
-//        p1.registrarResultado(3, 1);
-//        pFlamengo.adicionarPartida(p1);
-//        pCorinthians.adicionarPartida(p1);
-//        System.out.println(timeFlamengo.getNome() + " vence " + timeCorinthians.getNome() + " 3x1");
-//
-//
-//        Partida p2 = new Partida(UUID.randomUUID(), timePalmeiras, timeSaoPaulo);
-//        p2.registrarResultado(0, 0);
-//        pPalmeiras.adicionarPartida(p2);
-//        pSaoPaulo.adicionarPartida(p2);
-//        System.out.println(timePalmeiras.getNome() + " empata com " + timeSaoPaulo.getNome() + " 0x0");
-//
-//        Partida p3 = new Partida(UUID.randomUUID(), timeGremio, timeInternacional);
-//        p3.registrarResultado(2, 1);
-//        pGremio.adicionarPartida(p3);
-//        pInternacional.adicionarPartida(p3);
-//        System.out.println(timeGremio.getNome() + " vence " + timeInternacional.getNome() + " 2x1");
-//
-//        Partida p4 = new Partida(UUID.randomUUID(), timeCorinthians, timePalmeiras);
-//        p4.registrarResultado(2, 0);
-//        pCorinthians.adicionarPartida(p4);
-//        pPalmeiras.adicionarPartida(p4);
-//        System.out.println(timeCorinthians.getNome() + " vence " + timePalmeiras.getNome() + " 2x0");
-//
-//        Partida p5 = new Partida(UUID.randomUUID(), timeSaoPaulo, timeGremio);
-//        p5.registrarResultado(1, 1);
-//        pSaoPaulo.adicionarPartida(p5);
-//        pGremio.adicionarPartida(p5);
-//        System.out.println(timeSaoPaulo.getNome() + " empata com " + timeGremio.getNome() + " 1x1");
-//
-//        Partida p6 = new Partida(UUID.randomUUID(), timeInternacional, timeFlamengo);
-//        p6.registrarResultado(0, 3);
-//        pInternacional.adicionarPartida(p6);
-//        pFlamengo.adicionarPartida(p6);
-//        System.out.println(timeInternacional.getNome() + " perde para " + timeFlamengo.getNome() + " 0x3");
-//
-//        Partida p7 = new Partida(UUID.randomUUID(), timeCruzeiro, timeCorinthians);
-//        p7.registrarResultado(1, 2);
-//        pCruzeiro.adicionarPartida(p7);
-//        pCorinthians.adicionarPartida(p7);
-//        System.out.println(timeCruzeiro.getNome() + " perde para " + timeCorinthians.getNome() + " 1x2");
+        preencherLiga(liga);
 
+        decTraco("Liga preenchido com sucesso!");
 
-        // --- 5. Exibir a Tabela ---
-        System.out.println("\n--- Tabela Final ---");
-        Display.displayTabela(minhaTabela);
+        DisplayService.displayTabela(liga);
 
-        // --- 6. Buscar participante por nome (Exemplo) ---
-        System.out.println("\n--- Buscando Participante ---");
-        Participante palmeirasNaTabela = minhaTabela.getParticipantePorNome("Palmeiras");
-        if (palmeirasNaTabela != null) {
-            System.out.println(
-                    "Encontrado: " + palmeirasNaTabela.getTime().getNome() + " - Pontos: " +
-                    palmeirasNaTabela.getPontos());
+        System.out.println("\n--- Partidas Geradas na Liga ---");
+        List<Partida> partidas = liga.getPartidas();
+        if (partidas.isEmpty()) {
+            System.out.println("Nenhuma partida foi gerada.");
         } else {
-            System.out.println("Palmeiras não encontrado na tabela.");
+            for (int i = 0; i < partidas.size(); i++) {
+                System.out.println("Partida " + (i + 1) + ": " +
+                                   partidas.get(i).toString());
+            }
+        }
+    }
+
+    public static Optional<Liga> criarLiga() {
+        boolean ligaCriada = false;
+
+        Liga liga = null;
+
+        while (!ligaCriada) {
+            boolean continuar = CLIUtil.desejaContinuar("Deseja continuar a criação de Liga?");
+
+            if (!continuar) {
+                return Optional.empty();
+            }
+
+            String nome = ScanTipo.scanString("Nome da liga: ");
+            int maxParticipantes = ScanTipo.scanInt("Máximo de participantes da liga: ");
+            int qtdClassificados = ScanTipo.scanInt("Quantidade de classificados da liga: ");
+
+            String nomeClassificacao = null;
+            if (qtdClassificados > 0) {
+                nomeClassificacao = ScanTipo.scanString("Eles se classificarão para: ");
+            }
+
+            int qtdRebaixados = ScanTipo.scanInt("Quantidade de rebaixamentos da liga: ");
+
+            try {
+                liga = new Liga(nome,
+                                maxParticipantes,
+                                qtdClassificados,
+                                nomeClassificacao,
+                                qtdRebaixados);
+                ligaCriada = true;
+            } catch (Exception e) {
+                System.out.println("Erro ao criar Liga: ");
+                System.out.println(e.getMessage());
+            }
         }
 
-        System.out.println("\nTeste de Tabela e Display Concluído!");
+        return Optional.of(liga);
+    }
+
+    public static void preencherLiga(Liga liga) {
+        int i = 1;
+
+        while (liga.getParticipantes().size() < liga.getMaxParticipantes()) {
+            adicionarParticipanteLiga(i, liga);
+            System.out.println();
+
+            i++;
+        }
+    }
+
+    public static void adicionarParticipanteLiga(int iesimo, Liga liga) {
+        String nome = ScanTipo.scanString("Nome do " + iesimo + "° time: ");
+
+        System.out.println("Escolha até 3 cores para o time");
+        imprimirCores();
+
+        String cor1 = escolherCor();
+        String cor2 = escolherCor();
+        String cor3 = null;
+
+        boolean querCor3 = CLIUtil.desejaContinuar("Deseja uma terceira cor?");
+
+        if (querCor3) {
+            cor3 = escolherCor();
+        }
+
+        Time time = new Time(nome, cor1, cor2, cor3);
+
+        liga.adicionarParticipante(time);
+    }
+
+    private static void imprimirCores() {
+        imprimirCor(Cor.FUNDO_BRANCO, "[1]BRANCO");
+        imprimirCor(Cor.FUNDO_PRETO, "[2]PRETO");
+        imprimirCor(Cor.FUNDO_CINZA, "[3]CINZA");
+        imprimirCor(Cor.FUNDO_VERMELHO, "[4]VERMELHO");
+        imprimirCor(Cor.FUNDO_VERDE, "[5]VERDE");
+
+        System.out.println();
+
+        imprimirCor(Cor.FUNDO_AZUL, "[6]AZUL");
+        imprimirCor(Cor.FUNDO_LARANJA, "[7]LARANJA");
+        imprimirCor(Cor.FUNDO_AMARELO, "[8]AMARELO");
+        imprimirCor(Cor.FUNDO_CIANO, "[9]CIANO");
+        imprimirCor(Cor.FUNDO_ROXO, "[10]ROXO");
+
+        System.out.println();
+
+        imprimirCor(Cor.FUNDO_ROSA, "[11]ROSA");
+        imprimirCor(Cor.FUNDO_CINZA_CLARO, "[12]CINZA CLARO");
+        imprimirCor(Cor.FUNDO_VERMELHO_ESCURO, "[13]VERMELHO ESCURO");
+        imprimirCor(Cor.FUNDO_VERDE_ESCURO, "[14]VERDE ESCURO");
+        imprimirCor(Cor.FUNDO_AZUL_MARINHO, "[15]AZUL MARINHO");
+
+        System.out.println();
+
+        imprimirCor(Cor.FUNDO_LARANJA_ESCURO, "[16]LARANJA ESCURO");
+        imprimirCor(Cor.FUNDO_AMARELO_OURO, "[17]AMARELO OURO");
+        imprimirCor(Cor.FUNDO_CIANO_ESCURO, "[18]CIANO ESCURO");
+        imprimirCor(Cor.FUNDO_ROXO_ESCURO, "[19]ROXO ESCURO");
+        imprimirCor(Cor.FUNDO_ROSA_ESCURO, "[20]ROSA ESCURO");
+
+        System.out.println();
+    }
+
+    private static void imprimirCor(String cor, String nomeCor) {
+        System.out.printf("%s   %-30s", cor, Cor.RESET + nomeCor);
+    }
+
+    private static String escolherCor() {
+        int numCor = ScanTipo.scanIntEmIntervalo("Digite o número de uma das cores: ", 1, 20);
+
+        return switch (numCor) {
+            case 1 -> Cor.FUNDO_BRANCO;
+            case 2 -> Cor.FUNDO_PRETO;
+            case 3 -> Cor.FUNDO_CINZA;
+            case 4 -> Cor.FUNDO_VERMELHO;
+            case 5 -> Cor.FUNDO_VERDE;
+            case 6 -> Cor.FUNDO_AZUL;
+            case 7 -> Cor.FUNDO_LARANJA;
+            case 8 -> Cor.FUNDO_AMARELO;
+            case 9 -> Cor.FUNDO_CIANO;
+            case 10 -> Cor.FUNDO_ROXO;
+            case 11 -> Cor.FUNDO_ROSA;
+            case 12 -> Cor.FUNDO_CINZA_CLARO;
+            case 13 -> Cor.FUNDO_VERMELHO_ESCURO;
+            case 14 -> Cor.FUNDO_VERDE_ESCURO;
+            case 15 -> Cor.FUNDO_AZUL_MARINHO;
+            case 16 -> Cor.FUNDO_LARANJA_ESCURO;
+            case 17 -> Cor.FUNDO_AMARELO_OURO;
+            case 18 -> Cor.FUNDO_CIANO_ESCURO;
+            case 19 -> Cor.FUNDO_ROXO_ESCURO;
+            case 20 -> Cor.FUNDO_ROSA_ESCURO;
+            default -> {
+                System.err.println(
+                        "Erro: Número de cor fora do intervalo esperado. Retornando cor padrão.");
+                yield Cor.RESET;
+            }
+        };
     }
 }

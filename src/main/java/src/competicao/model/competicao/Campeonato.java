@@ -11,11 +11,12 @@ public interface Campeonato {
 
     public void adicionarPartida(Partida partida);
 
-    public void registrarResultadoPartida(Partida partida,
-                                          Integer golsMandante,
-                                          Integer golsVisitante);
+    public void registrarResultadoPartida(Partida partida, int golsMandante, int golsVisitante);
 
     List<Participante> getParticipantes();
 
     List<Partida> getPartidas();
+
+    int getMaxParticipantes();
+
 }
