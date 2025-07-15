@@ -1,6 +1,8 @@
 // src/competicao/main/Main.java
 package src.competicao;
 
+import src.competicao.model.competicao.Copa;
+import src.competicao.model.competicao.Grupo;
 import src.competicao.model.competicao.Liga;
 import src.competicao.model.core.Partida;
 import src.competicao.model.core.Time;
@@ -18,13 +20,13 @@ public class Main {
     private static final String barraTraco = "-".repeat(77);
     private static final String barraIgual = "=".repeat(77);
 
-    private static void decTraco(String message) {
+    public static void decTraco(String message) {
         System.out.println(Cor.TEXT_VERDE_ESCURO_BOLD + barraTraco);
         System.out.println(message);
         System.out.println(barraTraco + Cor.RESET);
     }
 
-    private static void decIgual(String message) {
+    public static void decIgual(String message) {
         System.out.println(Cor.TEXT_VERDE_ESCURO_BOLD + barraIgual);
         System.out.println(message);
         System.out.println(barraIgual + Cor.RESET);
@@ -59,6 +61,59 @@ public class Main {
     }
 
     private static void fluxoCopa() {
+        Optional<Copa> novaCopa = criarCopa();
+
+        if (novaCopa.isEmpty()) {
+            System.out.println("A Liga não foi criada.");
+            return;
+        }
+
+        Copa copa = novaCopa.get();
+        decTraco("Copa criada com sucesso.");
+
+        preencherCopa(copa);
+        decTraco("Copa preenchida com sucesso");
+
+        for (Grupo grupo : copa.getGrupos()) {
+            DisplayService.displayTabela(grupo);
+
+            decTraco("Partidas Geradas no " + grupo.getNome());
+            List<Partida> partidas = grupo.getPartidas();
+            if (partidas.isEmpty()) {
+                throw new IllegalStateException("Nenhuma partida foi gerada no " + grupo.getNome());
+            } else {
+                grupo.imprimirPartidasPorRodada();
+                System.out.println();
+            }
+        }
+
+        for (int r = 0; r < copa.getGrupos().getFirst().getQtdRodadas(); r++) {
+            for (Grupo grupo : copa.getGrupos()) {
+                decIgual("REGISTRAR RESULTADOS DA RODADA " + (r + 1) + " DO " + grupo.getNome());
+                grupo.pedirResultadoPorRodada(r);
+
+                decTraco("Tabela do " + grupo.getNome() + " após a Rodada " + (r + 1));
+                DisplayService.displayTabela(grupo);
+            }
+        }
+
+        for (Grupo grupo : copa.getGrupos()) {
+            String primeiro = grupo.getClassificacao().getFirst().getTime().getNome();
+            String segundo = grupo.getClassificacao().get(1).getTime().getNome();
+
+            System.out.println();
+            System.out.println(
+                    primeiro + " e " + segundo + " do " + grupo.getNome() +
+                    " se classificaram para as eliminatórias");
+        }
+
+        /* TODO:
+            AVANÇAR PARA AS ELIMINATÓRIAS COM OS CLASSIFICADOS
+         */
+
+        copa.avancarParaEliminatorias();
+
+
     }
 
     private static void fluxoLiga() {
@@ -70,16 +125,14 @@ public class Main {
         }
 
         Liga liga = novaLiga.get();
-
         decTraco("Liga criada com sucesso!");
 
         preencherLiga(liga);
-
         decTraco("Liga preenchido com sucesso!");
 
         DisplayService.displayTabela(liga);
 
-        decTraco("Partidas Geradas na Liga");
+        decTraco("Partidas Geradas no(a) " + liga.getNome());
         List<Partida> partidas = liga.getPartidas();
         if (partidas.isEmpty()) {
             throw new IllegalStateException("Nenhuma partida foi gerada na Liga.");
@@ -90,14 +143,46 @@ public class Main {
         decTraco("Registrar resultado das rodadas");
 
         for (int r = 0; r < liga.getQtdRodadas(); r++) {
+            decTraco("Registre os resultados dos jogos da Rodada " + (r + 1));
             liga.pedirResultadoPorRodada(r);
             decTraco("Tabela da Liga após a Rodada " + (r + 1));
             DisplayService.displayTabela(liga);
         }
 
+        decIgual("LIGA FINALIZADA --- CAMPEÃO: " +
+                 liga.getClassificacao().getFirst().getTime().getNome());
+
     }
 
-    public static Optional<Liga> criarLiga() {
+    private static Optional<Copa> criarCopa() {
+        boolean copaCriada = false;
+
+        Copa copa = null;
+
+        while (!copaCriada) {
+            boolean continuar = CLIUtil.desejaContinuar("Deseja continuar a criação de Copa?");
+
+            if (!continuar) {
+                return Optional.empty();
+            }
+
+            String nome = ScanTipo.scanString("Nome da Copa: ");
+            int maxParticipantes =
+                    ScanTipo.scanIntMinimo("Número de participantes da Copa (8, 16 ou 32): ", 8);
+
+            try {
+                copa = new Copa(nome, maxParticipantes);
+                copaCriada = true;
+            } catch (Exception e) {
+                System.out.println("Erro ao criar Copa: ");
+                System.out.println(e.getMessage());
+            }
+        }
+
+        return Optional.of(copa);
+    }
+
+    private static Optional<Liga> criarLiga() {
         boolean ligaCriada = false;
 
         Liga liga = null;
@@ -110,7 +195,8 @@ public class Main {
             }
 
             String nome = ScanTipo.scanString("Nome da liga: ");
-            int maxParticipantes = ScanTipo.scanInt("Máximo de participantes da liga: ");
+            int maxParticipantes =
+                    ScanTipo.scanIntMinimo("Máximo de participantes da liga (min 4): ", 4);
 
             int qtdClassificados = ScanTipo.scanInt("Quantidade de classificados da liga: ");
 
@@ -137,18 +223,47 @@ public class Main {
         return Optional.of(liga);
     }
 
-    public static void preencherLiga(Liga liga) {
+    private static void preencherCopa(Copa copa) {
         int i = 1;
 
-        while (liga.getParticipantes().size() < liga.getMaxParticipantes()) {
-            adicionarParticipanteLiga(i, liga);
-            System.out.println();
-
+        while (copa.getParticipantes().size() < copa.getMaxParticipantes()) {
+            adicionarParticipanteCopa(i, copa);
             i++;
         }
     }
 
-    public static void adicionarParticipanteLiga(int iesimo, Liga liga) {
+    private static void preencherLiga(Liga liga) {
+        int i = 1;
+
+        while (liga.getParticipantes().size() < liga.getMaxParticipantes()) {
+            adicionarParticipanteLiga(i, liga);
+            i++;
+        }
+    }
+
+    private static void adicionarParticipanteCopa(int iesimo, Copa copa) {
+        String nome = ScanTipo.scanString("Nome do " + iesimo + "° time: ");
+
+        imprimirCores();
+        System.out.println("Escolha até 3 cores para o time");
+
+        String cor1 = escolherCor();
+        String cor2 = escolherCor();
+        String cor3 = null;
+
+        boolean querCor3 = CLIUtil.desejaContinuar("Deseja uma terceira cor?");
+
+        if (querCor3) {
+            cor3 = escolherCor();
+        }
+
+        Time time = new Time(nome, cor1, cor2, cor3);
+
+        copa.adicionarParticipante(time);
+        System.out.println();
+    }
+
+    private static void adicionarParticipanteLiga(int iesimo, Liga liga) {
         String nome = ScanTipo.scanString("Nome do " + iesimo + "° time: ");
 
         imprimirCores();
@@ -167,6 +282,7 @@ public class Main {
         Time time = new Time(nome, cor1, cor2, cor3);
 
         liga.adicionarParticipante(time);
+        System.out.println();
     }
 
     private static void imprimirCores() {
@@ -190,12 +306,12 @@ public class Main {
         imprimirCor(Cor.FUNDO_CINZA_CLARO, "[12]CINZA CLARO");
         imprimirCor(Cor.FUNDO_VERMELHO_ESCURO, "[13]VERMELHO ESCURO");
         imprimirCor(Cor.FUNDO_VERDE_ESCURO, "[14]VERDE ESCURO");
-        imprimirCor(Cor.FUNDO_AZUL_MARINHO, "[15]AZUL MARINHO");
+        imprimirCor(Cor.FUNDO_AZUL_ESCURO, "[15]AZUL ESCURO");
 
         System.out.println();
 
         imprimirCor(Cor.FUNDO_LARANJA_ESCURO, "[16]LARANJA ESCURO");
-        imprimirCor(Cor.FUNDO_AMARELO_OURO, "[17]AMARELO OURO");
+        imprimirCor(Cor.FUNDO_AMARELO_ESCURO, "[17]AMARELO ESCURO");
         imprimirCor(Cor.FUNDO_CIANO_ESCURO, "[18]CIANO ESCURO");
         imprimirCor(Cor.FUNDO_ROXO_ESCURO, "[19]ROXO ESCURO");
         imprimirCor(Cor.FUNDO_ROSA_ESCURO, "[20]ROSA ESCURO");
@@ -225,9 +341,9 @@ public class Main {
             case 12 -> Cor.FUNDO_CINZA_CLARO;
             case 13 -> Cor.FUNDO_VERMELHO_ESCURO;
             case 14 -> Cor.FUNDO_VERDE_ESCURO;
-            case 15 -> Cor.FUNDO_AZUL_MARINHO;
+            case 15 -> Cor.FUNDO_AZUL_ESCURO;
             case 16 -> Cor.FUNDO_LARANJA_ESCURO;
-            case 17 -> Cor.FUNDO_AMARELO_OURO;
+            case 17 -> Cor.FUNDO_AMARELO_ESCURO;
             case 18 -> Cor.FUNDO_CIANO_ESCURO;
             case 19 -> Cor.FUNDO_ROXO_ESCURO;
             case 20 -> Cor.FUNDO_ROSA_ESCURO;

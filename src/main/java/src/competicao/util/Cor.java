@@ -20,10 +20,10 @@ public class Cor {
 
     private static String CINZA_CLARO = "192;192;192m";
     private static String VERMELHO_ESCURO = "141;8;1m";
-    private static String VERDE_ESCURO = "0;127;95m";
-    private static String AZUL_MARINHO = "3;4;94m";
+    private static String VERDE_ESCURO = "0;100;70m";
+    private static String AZUL_ESCURO = "3;4;94m";
     private static String LARANJA_ESCURO = "208;0;0m";
-    private static String AMARELO_OURO = "255;215;0m";
+    private static String AMARELO_ESCURO = "255;215;0m";
     private static String CIANO_ESCURO = "2;77;149m";
     private static String ROXO_ESCURO = "60;9;108m";
     private static String ROSA_ESCURO = "181;23;158m";
@@ -44,9 +44,9 @@ public class Cor {
     public static final String TEXT_CINZA_CLARO = "\u001B[38;2;" + CINZA_CLARO;
     public static final String TEXT_VERMELHO_ESCURO = "\u001B[38;2;" + VERMELHO_ESCURO;
     public static final String TEXT_VERDE_ESCURO = "\u001B[38;2;" + VERDE_ESCURO;
-    public static final String TEXT_AZUL_MARINHO = "\u001B[38;2;" + AZUL_MARINHO;
+    public static final String TEXT_AZUL_ESCURO = "\u001B[38;2;" + AZUL_ESCURO;
     public static final String TEXT_LARANJA_ESCURO = "\u001B[38;2;" + LARANJA_ESCURO;
-    public static final String TEXT_AMARELO_OURO = "\u001B[38;2;" + AMARELO_OURO;
+    public static final String TEXT_AMARELO_ESCURO = "\u001B[38;2;" + AMARELO_ESCURO;
     public static final String TEXT_CIANO_ESCURO = "\u001B[38;2;" + CIANO_ESCURO;
     public static final String TEXT_ROXO_ESCURO = "\u001B[38;2;" + ROXO_ESCURO;
     public static final String TEXT_ROSA_ESCURO = "\u001B[38;2;" + ROSA_ESCURO;
@@ -57,7 +57,7 @@ public class Cor {
 
     public static final String TEXT_VERMELHO_ESCURO_BOLD = BOLD + "\u001B[38;2;" + VERMELHO_ESCURO;
     public static final String TEXT_VERDE_ESCURO_BOLD = BOLD + "\u001B[38;2;" + VERDE_ESCURO;
-    public static final String TEXT_AZUL_MARINHO_BOLD = BOLD + "\u001B[38;2;" + AZUL_MARINHO;
+    public static final String TEXT_AZUL_ESCURO_BOLD = BOLD + "\u001B[38;2;" + AZUL_ESCURO;
 
     // FUNDOS
     public static final String FUNDO_BRANCO = "\u001B[48;2;" + BRANCO;
@@ -75,9 +75,9 @@ public class Cor {
     public static final String FUNDO_CINZA_CLARO = "\u001B[48;2;" + CINZA_CLARO;
     public static final String FUNDO_VERMELHO_ESCURO = "\u001B[48;2;" + VERMELHO_ESCURO;
     public static final String FUNDO_VERDE_ESCURO = "\u001B[48;2;" + VERDE_ESCURO;
-    public static final String FUNDO_AZUL_MARINHO = "\u001B[48;2;" + AZUL_MARINHO;
+    public static final String FUNDO_AZUL_ESCURO = "\u001B[48;2;" + AZUL_ESCURO;
     public static final String FUNDO_LARANJA_ESCURO = "\u001B[48;2;" + LARANJA_ESCURO;
-    public static final String FUNDO_AMARELO_OURO = "\u001B[48;2;" + AMARELO_OURO;
+    public static final String FUNDO_AMARELO_ESCURO = "\u001B[48;2;" + AMARELO_ESCURO;
     public static final String FUNDO_CIANO_ESCURO = "\u001B[48;2;" + CIANO_ESCURO;
     public static final String FUNDO_ROXO_ESCURO = "\u001B[48;2;" + ROXO_ESCURO;
     public static final String FUNDO_ROSA_ESCURO = "\u001B[48;2;" + ROSA_ESCURO;

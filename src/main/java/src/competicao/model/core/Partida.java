@@ -67,6 +67,22 @@ public class Partida {
         return jogada;
     }
 
+    public Participante getVencedor() {
+//        if (!isJogada()) {
+//            throw new IllegalStateException("A partida precisa ter sido jogada para ter um vencedor");
+//        }
+
+        if (golsMandante == golsVisitante) {
+            throw new IllegalStateException("Essa partida não possui um vencedor (empate)");
+        }
+
+        if (golsMandante > golsVisitante) {
+            return mandante;
+        } else {
+            return visitante;
+        }
+    }
+
     @Override
     public String toString() {
         if (isJogada()) {

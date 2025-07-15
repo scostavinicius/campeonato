@@ -1,60 +1,98 @@
 package src.competicao.model.competicao;
 
 import src.competicao.model.core.Participante;
-import src.competicao.model.core.Partida;
 import src.competicao.model.core.Time;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Copa implements Campeonato {
-    private List<Participante> participantes;
-    private List<Partida> partidas;
+public class Copa extends Campeonato {
     private List<Grupo> grupos;
     private Eliminatoria eliminatoria;
 
-    public Copa() {
-        this.participantes = new ArrayList<>();
-        this.partidas = new ArrayList<>();
+    public Copa(String nome, int maxParticipantes) {
+        super(nome);
+        setMaxParticipantes(maxParticipantes);
         this.grupos = new ArrayList<>();
         this.eliminatoria = new Eliminatoria();
     }
 
-    @Override
     public void adicionarParticipante(Time time) {
+        super.adicionarParticipante(time);
+
+        if (this.getParticipantes().size() == maxParticipantes) {
+            gerarGrupos();
+        }
+    }
+
+    private void gerarGrupos() {
+        int qtdGrupos = maxParticipantes / 4;
+
+        for (int g = 0; g < qtdGrupos; g++) {
+            int indicePrimeiroParticipante = g * 4;
+
+            Grupo grupo = new Grupo("Grupo " + (g + 1));
+
+            for (int pg = 0; pg < 4; pg++) {
+                Participante participante = participantes.get(pg + indicePrimeiroParticipante);
+
+                grupo.adicionarParticipante(participante.getTime());
+            }
+
+            adicionarGrupo(grupo);
+        }
+
 
     }
 
-    @Override
-    public void adicionarPartida(Partida partida) {
+    private void adicionarGrupo(Grupo grupo) {
+        Objects.requireNonNull(grupo, "Grupo não pode ser nulo");
 
+        this.grupos.add(grupo);
     }
 
-    @Override
-    public void registrarResultadoPartida(Partida partida, int golsMandante, int golsVisitante) {
+    public void avancarParaEliminatorias() {
+        int qtdClassificados = grupos.size() * grupos.getFirst().getQtdClassificados();
 
-    }
+        this.eliminatoria = new Eliminatoria(qtdClassificados);
 
-    @Override
-    public List<Participante> getParticipantes() {
-        return participantes;
-    }
+        List<Participante> classificados = new ArrayList<>();
 
-    @Override
-    public List<Partida> getPartidas() {
-        return partidas;
-    }
+        for (Grupo grupo : grupos) {
+            for (int c = 0; c < 2; c++) {
+                classificados.add(grupo.getClassificacao().get(c));
+            }
+        }
 
-    @Override
-    public int getMaxParticipantes() {
-        return 0;
+        eliminatoria.adicionarClassificados(classificados);
+        eliminatoria.jogarFaseEliminatoria();
     }
 
     public List<Grupo> getGrupos() {
-        return grupos;
+        return new ArrayList<>(grupos);
     }
 
     public Eliminatoria getEliminatoria() {
         return eliminatoria;
+    }
+
+    public void setMaxParticipantes(int maxParticipantes) {
+        if (maxParticipantes < 8) {
+            throw new IllegalArgumentException(
+                    "O número máximo de participantes deve ser no mínimo 8.");
+        }
+
+        if (maxParticipantes != 8 && maxParticipantes != 16 && maxParticipantes != 32) {
+            throw new IllegalArgumentException(
+                    "O número máximo de participantes deve ser 8, 16 ou 32.");
+        }
+
+        if (maxParticipantes < this.participantes.size()) {
+            throw new IllegalArgumentException(
+                    "O número máximo de participantes não pode ser menor que o número atual de participantes.");
+        }
+
+        this.maxParticipantes = maxParticipantes;
     }
 }

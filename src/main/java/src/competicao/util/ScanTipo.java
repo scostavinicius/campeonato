@@ -41,13 +41,13 @@ public class ScanTipo {
         return inteiro;
     }
 
-    public static int scanIntPositivo(String message) {
+    public static int scanIntMinimo(String message, int min) {
         int inteiro;
 
         while (true) {
             inteiro = scanInt(message);
-            if (inteiro < 0) {
-                System.out.println("Digite um número positivo.");
+            if (inteiro < min) {
+                System.out.println("Digite um número maior que " + (min - 1));
             } else {
                 break;
             }

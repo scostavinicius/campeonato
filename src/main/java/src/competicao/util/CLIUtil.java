@@ -14,4 +14,16 @@ public class CLIUtil {
 
         return Objects.equals(resposta, "s");
     }
+
+    public static boolean marcouPenalti(String time) {
+        System.out.print("O time " + time + " marcou o penalti? (s/n) ");
+        String resposta = ScanTipo.scanString("");
+
+        while (!Objects.equals(resposta, "s") && !Objects.equals(resposta, "n")) {
+            System.out.print("O time " + time + " marcou o penalti? (s/n) ");
+            resposta = ScanTipo.scanString("");
+        }
+
+        return Objects.equals(resposta, "s");
+    }
 }
