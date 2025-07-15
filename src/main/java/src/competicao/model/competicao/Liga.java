@@ -3,20 +3,11 @@ package src.competicao.model.competicao;
 import src.competicao.model.core.Participante;
 import src.competicao.model.core.Partida;
 import src.competicao.model.core.Time;
-import src.competicao.service.GerarRodadasService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class Liga implements Campeonato, PontosCorridos {
-    private String nome;
-    private List<Participante> participantes;
-    private List<Partida> partidas;
-    private int maxParticipantes;
-    private int qtdClassificados;
-    private String nomeClassificacao;
+public class Liga extends PontosCorridos implements Campeonato {
     private int qtdRebaixados;
 
     public Liga(String nome,
@@ -24,16 +15,7 @@ public class Liga implements Campeonato, PontosCorridos {
                 int qtdClassificados,
                 String nomeClassificacao,
                 int qtdRebaixados) {
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("O nome da Liga não pode ser nulo ou vazio.");
-        }
-
-        this.nome = nome.trim();
-        this.participantes = new ArrayList<>();
-        this.partidas = new ArrayList<>();
-
-        setMaxParticipantes(maxParticipantes);
-        setClassificacao(qtdClassificados, nomeClassificacao);
+        super(nome, maxParticipantes, qtdClassificados, nomeClassificacao);
         setQtdRebaixados(qtdRebaixados);
     }
 
@@ -54,94 +36,42 @@ public class Liga implements Campeonato, PontosCorridos {
         } else {
             this.participantes.add(participante);
             if (this.getParticipantes().size() == maxParticipantes) {
-                GerarRodadasService.gerarRodadasLiga(this);
+                gerarRodadasLiga();
             }
         }
     }
 
-    @Override
-    public void adicionarPartida(Partida partida) {
-        Objects.requireNonNull(partida, "A partida não pode ser nula.");
+    private void gerarRodadasLiga() {
+        List<Participante> participantes = this.getParticipantes();
 
-        if (this.participantes.size() < this.maxParticipantes) {
-            throw new IllegalStateException(
-                    "A Liga deve estar cheia para que as partidas possam ser iniciadas.");
+        int numParticipantes = this.getMaxParticipantes();
+
+        if (participantes.isEmpty()) {
+            throw new IllegalStateException("A Liga não pode estar vazia.");
         }
 
-        if (partida.isJogada()) {
-            throw new IllegalArgumentException(
-                    "As partidas de uma Liga não podem ter sigo jogadas ao serem adicionadas.");
+        if (participantes.size() < numParticipantes) {
+            throw new IllegalStateException("A Liga ainda não está cheia");
         }
 
-        if (!participantes.contains(partida.getMandante()) ||
-            !participantes.contains(partida.getVisitante())) {
-            throw new IllegalArgumentException(
-                    "Os participantes da partida devem ambos participar da Liga.");
-        }
+//        if (liga.getPartidas().size() == (numParticipantes - 1) * (numParticipantes - 2)) {
+//            throw new IllegalStateException("As partidas da Liga já foram registradas.");
+//        }
 
-        if (this.partidas.contains(partida)) {
-            throw new IllegalArgumentException("A Liga já adicionou essa partida");
-        }
-
-        this.partidas.add(partida);
-    }
-
-    @Override
-    public void registrarResultadoPartida(Partida partida,
-                                          int golsMandante,
-                                          int golsVisitante) {
-        Objects.requireNonNull(partida, "A partida não pode ser nula.");
-
-        if (!this.partidas.contains(partida)) {
-            throw new IllegalArgumentException("A partida não pertence à liga " + this.nome + ".");
-        }
-
-        partida.registrarResultado(golsMandante, golsVisitante);
-    }
-
-    public Participante getParticipantePorNome(String nome) {
-        Objects.requireNonNull(nome, "O nome do time não pode ser nulo.");
-
-        for (Participante p : this.participantes) {
-            if (p.getTime().getNome().equals(nome)) {
-                return p;
+        for (int rodada = 0; rodada < numParticipantes - 1; rodada++) {
+            for (int i = 0; i < (numParticipantes / 2); i++) {
+                this.adicionarPartida(new Partida(participantes.get(i),
+                                                  participantes.get(numParticipantes - i - 1)));
             }
+
+            Participante temp = participantes.get(numParticipantes - 1);
+
+            for (int i = numParticipantes - 1; i > 1; i--) {
+                participantes.set(i, participantes.get(i - 1));
+            }
+
+            participantes.set(1, temp);
         }
-
-        return null;
-    }
-
-    public List<Participante> getClassificacao() {
-        List<Participante> classificacao = new ArrayList<>(this.participantes);
-        Collections.sort(classificacao);
-        return classificacao;
-    }
-
-    @Override
-    public List<Participante> getParticipantes() {
-        return new ArrayList<>(participantes);
-    }
-
-    @Override
-    public List<Partida> getPartidas() {
-        return new ArrayList<>(partidas);
-    }
-
-    @Override
-    public int getMaxParticipantes() {
-        return maxParticipantes;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public int getQtdClassificados() {
-        return qtdClassificados;
-    }
-
-    public String getNomeClassificacao() {
-        return nomeClassificacao;
     }
 
     public int getQtdRebaixados() {
@@ -154,20 +84,7 @@ public class Liga implements Campeonato, PontosCorridos {
                     "A quantidade máxima  de participantes tem que ser maior que a quantidade de classificados mais a de rebaixados na Liga");
         }
 
-        if (maxParticipantes < this.participantes.size()) {
-            throw new IllegalArgumentException(
-                    "O número máximo de participantes não pode ser menor que o número atual de participantes na Liga.");
-        }
-
-        if (maxParticipantes <= 0) {
-            throw new IllegalArgumentException("O número máximo de participantes deve ser positivo.");
-        }
-
-        if (maxParticipantes % 2 != 0) {
-            throw new IllegalArgumentException("O número máximo de participantes deve ser par.");
-        }
-
-        this.maxParticipantes = Math.max(0, maxParticipantes);
+        super.setMaxParticipantes(maxParticipantes);
     }
 
     public void setQtdClassificados(int qtdClassificados) {
@@ -178,13 +95,7 @@ public class Liga implements Campeonato, PontosCorridos {
                     "A quantidade de classificados mais a de rebaixados não pode ser maior que o máximo de participantes da Liga");
         }
 
-        this.qtdClassificados = qtdClassificados;
-
-        if (this.qtdClassificados == 0) {
-            this.nomeClassificacao = null;
-        } else if (this.nomeClassificacao == null || this.nomeClassificacao.trim().isEmpty()) {
-            this.nomeClassificacao = "Classificados";
-        }
+        super.setQtdClassificados(qtdClassificados);
     }
 
     public void setClassificacao(int qtdClassificados, String nomeClassificacao) {
@@ -193,19 +104,7 @@ public class Liga implements Campeonato, PontosCorridos {
                     "A quantidade de classificados mais a de rebaixados não pode ser maior que o máximo de participantes da Liga");
         }
 
-        this.qtdClassificados = Math.max(0, qtdClassificados);
-        setNomeClassificacao(nomeClassificacao);
-    }
-
-    public void setNomeClassificacao(String nomeClassificacao) {
-        if (this.qtdClassificados == 0) {
-            this.nomeClassificacao = null;
-        } else {
-            this.nomeClassificacao =
-                    (nomeClassificacao != null && !nomeClassificacao.trim().isEmpty()) ?
-                    nomeClassificacao.trim() :
-                    "Classificados";
-        }
+        super.setClassificacao(qtdClassificados, nomeClassificacao);
     }
 
     public void setQtdRebaixados(int qtdRebaixados) {

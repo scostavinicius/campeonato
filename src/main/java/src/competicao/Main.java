@@ -79,16 +79,22 @@ public class Main {
 
         DisplayService.displayTabela(liga);
 
-        System.out.println("\n--- Partidas Geradas na Liga ---");
+        decTraco("Partidas Geradas na Liga");
         List<Partida> partidas = liga.getPartidas();
         if (partidas.isEmpty()) {
-            System.out.println("Nenhuma partida foi gerada.");
+            throw new IllegalStateException("Nenhuma partida foi gerada na Liga.");
         } else {
-            for (int i = 0; i < partidas.size(); i++) {
-                System.out.println("Partida " + (i + 1) + ": " +
-                                   partidas.get(i).toString());
-            }
+            liga.imprimirPartidasPorRodada();
         }
+
+        decTraco("Registrar resultado das rodadas");
+
+        for (int r = 0; r < liga.getQtdRodadas(); r++) {
+            liga.pedirResultadoPorRodada(r);
+            decTraco("Tabela da Liga após a Rodada " + (r + 1));
+            DisplayService.displayTabela(liga);
+        }
+
     }
 
     public static Optional<Liga> criarLiga() {
@@ -105,6 +111,7 @@ public class Main {
 
             String nome = ScanTipo.scanString("Nome da liga: ");
             int maxParticipantes = ScanTipo.scanInt("Máximo de participantes da liga: ");
+
             int qtdClassificados = ScanTipo.scanInt("Quantidade de classificados da liga: ");
 
             String nomeClassificacao = null;
@@ -144,8 +151,8 @@ public class Main {
     public static void adicionarParticipanteLiga(int iesimo, Liga liga) {
         String nome = ScanTipo.scanString("Nome do " + iesimo + "° time: ");
 
-        System.out.println("Escolha até 3 cores para o time");
         imprimirCores();
+        System.out.println("Escolha até 3 cores para o time");
 
         String cor1 = escolherCor();
         String cor2 = escolherCor();

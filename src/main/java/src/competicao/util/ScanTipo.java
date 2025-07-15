@@ -30,23 +30,26 @@ public class ScanTipo {
         int inteiro;
 
         while (true) {
-            while (true) {
-                System.out.print(message);
-
-                try {
-                    inteiro = scanner.nextInt();
-                    scanner.nextLine();
-
-                    break;
-                } catch (InputMismatchException e) {
-                    System.out.println("Digite um número inteiro.");
-                    scanner.nextLine();
-                }
-            }
+            inteiro = scanInt(message);
             if (inteiro >= min && inteiro <= max) {
                 break;
             } else {
                 System.out.println("Digite um número entre " + min + " e " + max + ".");
+            }
+        }
+
+        return inteiro;
+    }
+
+    public static int scanIntPositivo(String message) {
+        int inteiro;
+
+        while (true) {
+            inteiro = scanInt(message);
+            if (inteiro < 0) {
+                System.out.println("Digite um número positivo.");
+            } else {
+                break;
             }
         }
 

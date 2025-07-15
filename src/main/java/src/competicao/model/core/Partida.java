@@ -69,6 +69,12 @@ public class Partida {
 
     @Override
     public String toString() {
+        if (isJogada()) {
+            return mandante.toStringL() + " " + golsMandante +
+                   " x " +
+                   golsVisitante + " " + visitante.toStringR();
+        }
+
         return mandante.toStringL() + " x " + visitante.toStringR();
     }
 
